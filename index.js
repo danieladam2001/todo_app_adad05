@@ -1,96 +1,101 @@
 import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
 import ejs from 'ejs'
+import { drizzle } from 'drizzle-orm/libsql'
+import { todosTable } from './src/schema.js'
+import { eq } from 'drizzle-orm'
+
+const db = drizzle({
+  connection: 'file:db.sqlite',
+  logger: true,
+})
 
 const app = new Hono()
 
-let todos = [
-    {
-        id: 1,
-        title: 'Zajít na pivo',
-        done: true,
-    },
-    {
-        id: 2,
-        title: 'Jít učit Node.js',
-        done: false,
-    },
-]
-
 app.get(async (c, next) => {
-    console.log(c.req.method, c.req.url)
+  console.log(c.req.method, c.req.url)
 
-    await next()
+  await next()
 })
 
 app.get('/', async (c) => {
-    const html = await ejs.renderFile('views/index.html', {
-        name: 'Todos',
-        todos,
-    })
+  const todos = await db.select().from(todosTable).all()
 
-    return c.html(html)
+  const html = await ejs.renderFile('views/index.html', {
+    name: 'Todos',
+    todos,
+  })
+
+  return c.html(html)
 })
 
-app.get('/todo/:id', async (c) => {
-    const id = Number(c.req.param('id'))
+app.get('/todo/:id', async (c, next) => {
+  const id = Number(c.req.param('id'))
 
-    const html = await ejs.renderFile('views/todo_detail.html', {
-        todo: todos.find((todo) => todo.id === id)
-    })
+  const todo = await db.select().from(todosTable).where(eq(todosTable.id, id)).get()
 
-    return c.html(html)
+  if (!todo) return await next()
+
+  const html = ejs.renderFile('views/todo-detail.html', {
+    todo,
+  })
+
+  return c.html(html)
 })
 
 app.post('/add-todo', async (c) => {
-    const body = await c.req.formData()
-    const title = body.get('title')
+  const body = await c.req.formData()
+  const title = body.get('title')
 
-    todos.push({
-        id: todos.length + 1,
-        title,
-        done: false,
-    })
+  await db.insert(todosTable).values({
+    title,
+    done: false,
+  })
 
-    return c.redirect('/')
-})
-
-app.post('/rename-todo', async (c) => {
-    const body = await c.req.formData()
-    const id = Number(body.get('id'))
-    const title = body.get('title')
-
-    const todo = todos.find((todo) => todo.id === id)
-    todo.title = title
-
-    return c.redirect('/')
+  return c.redirect('/')
 })
 
 app.get('/remove-todo/:id', async (c) => {
-    const id = Number(c.req.param('id'))
+  const id = Number(c.req.param('id'))
 
-    todos = todos.filter((todo) => todo.id !== id)
+  await db.delete(todosTable).where(eq(todosTable.id, id))
 
-    return c.redirect('/')
+  return c.redirect('/')
 })
 
 app.get('/toggle-todo/:id', async (c) => {
-    const id = Number(c.req.param('id'))
+  const id = Number(c.req.param('id'))
 
-    const todo = todos.find((todo) => todo.id === id)
-    todo.done = !todo.done
+  const todo = await db.select().from(todosTable).where(eq(todosTable.id, id)).get()
 
-    return c.redirect('/')
+  await db.update(todosTable).set({ done: !todo.done }).where(eq(todosTable.id, id))
+
+  return redirectBack(c, '/')
+})
+
+app.post('/update-todo/:id', async (c) => {
+  const id = Number(c.req.param('id'))
+  const body = await c.req.formData()
+  const title = body.get('title')
+
+  await db.update(todosTable).set({ title }).where(eq(todosTable.id, id))
+
+  return redirectBack(c, '/')
 })
 
 app.notFound(async (c) => {
-    const html = await ejs.renderFile('views/404.html')
+  const html = await ejs.renderFile('views/404.html')
 
-    c.status(404)
+  c.status(404)
 
-    return c.html(html)
+  return c.html(html)
 })
 
 serve(app, (info) => {
-    console.log(`Server started on http://localhost:${info.port}`)
+  console.log(`Server started on http://localhost:${info.port}`)
 })
+
+const redirectBack = (c, fallbackUrl) => {
+  const referer = c.req.header('Referer')
+  return c.redirect(referer || fallbackUrl)
+}

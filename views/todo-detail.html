@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= todo.title %> – Todo detail</title>
+  </head>
+  <body>
+    <p><a href="/">&larr; Zpět na seznam</a></p>
+
+    <h1>
+      <% if (todo.done) { %>
+      <del><%= todo.title %></del>
+      <% } else { %> <%= todo.title %> <% } %>
+    </h1>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+      <tr>
+        <th>ID</th>
+        <td><%= todo.id %></td>
+      </tr>
+      <tr>
+        <th>Stav</th>
+        <td>
+          <% if (todo.done) { %>
+          <strong>&#10003; Hotovo</strong>
+          <% } else { %>
+          <em>&#8230; Čeká na splnění</em>
+          <% } %>
+        </td>
+      </tr>
+    </table>
+
+    <br />
+
+    <% if (todo.done) { %>
+    <a href="/toggle-todo/<%= todo.id %>">&#8617; Označit jako nehotové</a>
+    &nbsp;
+    <a href="/remove-todo/<%= todo.id %>">&#10007; Odstranit úkol</a>
+    <% } else { %>
+    <a href="/toggle-todo/<%= todo.id %>">&#10003; Označit jako hotové</a>
+    <% } %>
+
+    <hr />
+
+    <fieldset>
+      <legend><strong>Upravit název úkolu</strong></legend>
+      <form method="post" action="/update-todo/<%= todo.id %>">
+        <label for="title">Nový název:</label>
+        <br />
+        <input id="title" name="title" size="40" placeholder="<%= todo.title %>" />
+        <button type="submit">&#10003; Uložit</button>
+      </form>
+    </fieldset>
+  </body>
+</html>

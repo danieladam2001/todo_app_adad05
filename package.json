@@ -1,9 +1,9 @@
 {
-  "name": "todo_app",
+  "name": "node2026",
   "version": "1.0.0",
-  "description": "Lab Project",
+  "description": "",
   "license": "ISC",
-  "author": "Daniel Adam",
+  "author": "",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.11",
+    "@libsql/client": "^0.17.2",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
     "ejs": "^5.0.1",
-    "hono": "^4.12.9"
+    "hono": "^4.12.8"
   }
 }
