@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Název to-do: <%= todo.title %>!</h1>
+    <h2>Splněné: <%= todo.done ? "Ano" : "Ne" %></h2>
+    <a href="/toggle-todo/<%= todo.id %>"><%= todo.done ? "Označit jako nehotové" : "Označit jako hotové" %></a><br>
+    <a href="/remove-todo/<%= todo.id %>">odstranit</a>
+
+    <form method="post" action="/rename-todo">
+      <input name="id" value="<%= todo.id %>" readonly hidden />
+      <input name="title" />
+      <button type="submit">Přejmenovat</button>
+    </form>
+
+  </body>
+</html>
