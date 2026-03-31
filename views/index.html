@@ -19,6 +19,7 @@
           <th>#</th>
           <th>Úkol</th>
           <th>Stav</th>
+          <th>Priorita</th>
           <th>Akce</th>
         </tr>
       </thead>
@@ -32,6 +33,15 @@
               <del><%= todo.title %></del>
               <% } else { %> <%= todo.title %> <% } %>
             </a>
+          </td>
+          <td align="center">
+            <% if (todo.priority === "low") { %>
+            <strong>Nízká</strong>
+            <% } else if (todo.priority === "medium") { %>
+            <strong>Střední</strong>
+            <% } else { %>
+            <strong>Vysoká</strong>
+            <% } %>
           </td>
           <td align="center">
             <% if (todo.done) { %>

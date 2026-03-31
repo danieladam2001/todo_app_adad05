@@ -77,8 +77,9 @@ app.post('/update-todo/:id', async (c) => {
   const id = Number(c.req.param('id'))
   const body = await c.req.formData()
   const title = body.get('title')
+  const priority = body.get('priority')
 
-  await db.update(todosTable).set({ title }).where(eq(todosTable.id, id))
+  await db.update(todosTable).set({ title, priority }).where(eq(todosTable.id, id))
 
   return redirectBack(c, '/')
 })

@@ -29,6 +29,18 @@
           <% } %>
         </td>
       </tr>
+      <tr>
+        <th>Priorita</th>
+        <td>
+          <% if (todo.priority === "low") { %>
+          <strong>Nízká</strong>
+          <% } else if (todo.priority === "medium") { %>
+          <strong>Střední</strong>
+          <% } else { %>
+          <strong>Vysoká</strong>
+          <% } %>
+        </td>
+      </tr>
     </table>
 
     <br />
@@ -49,6 +61,15 @@
         <label for="title">Nový název:</label>
         <br />
         <input id="title" name="title" size="40" placeholder="<%= todo.title %>" />
+        <br /><br />
+        <label for="priority">Nová priorita:</label>
+        <br />
+        <select name="priority" id="priority">
+          <option value="low">Nízká</option>
+          <option value="medium">Střední</option>
+          <option value="high">Vysoká</option>
+        </select>
+        <br /><br />
         <button type="submit">&#10003; Uložit</button>
       </form>
     </fieldset>
