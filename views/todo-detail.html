@@ -33,18 +33,26 @@
     <script>
       const ws = new WebSocket('ws://localhost:3000/ws')
 
-      const path = window.location.pathname;
-      const match = path.match(/\/todo\/(\d+)/);
-      const todoId = Number(match[1]);
-      console.log(todoId);
-
       ws.addEventListener('message', (ev) => {
+
+        const path = window.location.pathname;
+        const match = path.match(/\/todo\/(\d+)/);
+        const todoId = Number(match[1]);
+        console.log(todoId);
+
         const json = JSON.parse(ev.data)
-        console.log(json.todo_id)
-        console.log(todoId)
-        console.log(json.todo_id === todoId)
+        console.log("type", json.type)
+        // console.log(todoId)
+        // console.log("update_todo_detailu",json.todo_id === todoId,json.type === 'todo_detail')
+        // console.log("delete_todo_detailu",json.todo_id === todoId,json.type === 'todo_detail_deleted')
         if (json.type === 'todo_detail' & json.todo_id === todoId) {
+          console.log("a");
           document.getElementById('todo_detail').innerHTML = json.html
+        } else if (json.type === 'todo_detail_deleted' & json.todo_id === todoId){
+          console.log("b");
+          window.location.href = '/todo-delete';
+        } else {
+          console.log("c")
         }
       })
     </script>

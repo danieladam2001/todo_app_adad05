@@ -93,6 +93,7 @@ app.get('/remove-todo/:id', async (c) => {
   await db.delete(todosTable).where(eq(todosTable.id, id))
 
   sendTodosToAllWebsockets()
+  sendTodoDeleteAlert(id)
 
   return c.redirect('/')
 })
@@ -105,6 +106,7 @@ app.get('/toggle-todo/:id', async (c) => {
   await db.update(todosTable).set({ done: !todo.done }).where(eq(todosTable.id, id))
 
   sendTodosToAllWebsockets()
+  sendTodoDetailToAllWebsockets(id)
 
   return redirectBack(c, '/')
 })
@@ -154,6 +156,21 @@ const sendTodoDetailToAllWebsockets = async (id) => {
   }
 }
 
+const sendTodoDeleteAlert = async (id) => {
+  try {
+    for (const webSocket of webSockets) {
+      webSocket.send(
+        JSON.stringify({
+          type: 'todo_detail_deleted',
+          todo_id: id
+        }),
+      )
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 app.post('/update-todo/:id', async (c) => {
   const id = Number(c.req.param('id'))
   const body = await c.req.formData()
@@ -166,6 +183,12 @@ app.post('/update-todo/:id', async (c) => {
   sendTodoDetailToAllWebsockets(id)
 
   return redirectBack(c, '/')
+})
+
+app.get('/todo-delete', async (c) => {
+  const html = ejs.renderFile('views/todo_detail_deleted.html')
+
+  return c.html(html)
 })
 
 app.notFound(async (c) => {
