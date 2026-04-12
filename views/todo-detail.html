@@ -20,6 +20,10 @@
         <td><%= todo.id %></td>
       </tr>
       <tr>
+        <th>Název</th>
+        <td><%= todo.title %></td>
+      </tr>
+      <tr>
         <th>Stav</th>
         <td>
           <% if (todo.done) { %>
@@ -31,15 +35,7 @@
       </tr>
       <tr>
         <th>Priorita</th>
-        <td>
-          <% if (todo.priority === "low") { %>
-          <strong>Nízká</strong>
-          <% } else if (todo.priority === "medium") { %>
-          <strong>Střední</strong>
-          <% } else { %>
-          <strong>Vysoká</strong>
-          <% } %>
-        </td>
+        <td><%= utils.formatPriority(todo.priority) %></td>
       </tr>
     </table>
 
@@ -60,16 +56,15 @@
       <form method="post" action="/update-todo/<%= todo.id %>">
         <label for="title">Nový název:</label>
         <br />
-        <input id="title" name="title" size="40" placeholder="<%= todo.title %>" />
-        <br /><br />
-        <label for="priority">Nová priorita:</label>
+        <input id="title" name="title" size="40" value="<%= todo.title %>" />
         <br />
-        <select name="priority" id="priority">
-          <option value="low">Nízká</option>
-          <option value="medium">Střední</option>
-          <option value="high">Vysoká</option>
+        <label>Priorita:</label>
+        <br />
+        <select name="priority">
+          <option value="low" <%= todo.priority === 'low' ? 'selected' : '' %>>Nízká</option>
+          <option value="medium" <%= todo.priority === 'medium' ? 'selected' : '' %>>Střední</option>
+          <option value="high" <%= todo.priority === 'high' ? 'selected' : '' %>>Vysoká</option>
         </select>
-        <br /><br />
         <button type="submit">&#10003; Uložit</button>
       </form>
     </fieldset>
