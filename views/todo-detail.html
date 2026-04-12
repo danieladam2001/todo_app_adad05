@@ -8,46 +8,7 @@
   <body>
     <p><a href="/">&larr; Zpět na seznam</a></p>
 
-    <h1>
-      <% if (todo.done) { %>
-      <del><%= todo.title %></del>
-      <% } else { %> <%= todo.title %> <% } %>
-    </h1>
-
-    <table border="1" cellpadding="6" cellspacing="0">
-      <tr>
-        <th>ID</th>
-        <td><%= todo.id %></td>
-      </tr>
-      <tr>
-        <th>Název</th>
-        <td><%= todo.title %></td>
-      </tr>
-      <tr>
-        <th>Stav</th>
-        <td>
-          <% if (todo.done) { %>
-          <strong>&#10003; Hotovo</strong>
-          <% } else { %>
-          <em>&#8230; Čeká na splnění</em>
-          <% } %>
-        </td>
-      </tr>
-      <tr>
-        <th>Priorita</th>
-        <td><%= utils.formatPriority(todo.priority) %></td>
-      </tr>
-    </table>
-
-    <br />
-
-    <% if (todo.done) { %>
-    <a href="/toggle-todo/<%= todo.id %>">&#8617; Označit jako nehotové</a>
-    &nbsp;
-    <a href="/remove-todo/<%= todo.id %>">&#10007; Odstranit úkol</a>
-    <% } else { %>
-    <a href="/toggle-todo/<%= todo.id %>">&#10003; Označit jako hotové</a>
-    <% } %>
+    <div id="todo_detail"><%- include('_todo_detail.html') %></div>
 
     <hr />
 
@@ -68,5 +29,25 @@
         <button type="submit">&#10003; Uložit</button>
       </form>
     </fieldset>
+
+    <script>
+      const ws = new WebSocket('ws://localhost:3000/ws')
+
+      const path = window.location.pathname;
+      const match = path.match(/\/todo\/(\d+)/);
+      const todoId = Number(match[1]);
+      console.log(todoId);
+
+      ws.addEventListener('message', (ev) => {
+        const json = JSON.parse(ev.data)
+        console.log(json.todo_id)
+        console.log(todoId)
+        console.log(json.todo_id === todoId)
+        if (json.type === 'todo_detail' & json.todo_id === todoId) {
+          document.getElementById('todo_detail').innerHTML = json.html
+        }
+      })
+    </script>
+
   </body>
 </html>

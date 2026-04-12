@@ -131,6 +131,29 @@ const sendTodosToAllWebsockets = async () => {
   }
 }
 
+const sendTodoDetailToAllWebsockets = async (id) => {
+  try {
+    const todo = await db.select().from(todosTable).where(eq(todosTable.id, id)).get()
+
+    const html = await ejs.renderFile('views/_todo_detail.html', {
+      todo,
+      utils,
+    })
+
+    for (const webSocket of webSockets) {
+      webSocket.send(
+        JSON.stringify({
+          type: 'todo_detail',
+          todo_id: id,
+          html,
+        }),
+      )
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 app.post('/update-todo/:id', async (c) => {
   const id = Number(c.req.param('id'))
   const body = await c.req.formData()
@@ -138,6 +161,9 @@ app.post('/update-todo/:id', async (c) => {
   const priority = body.get('priority')
 
   await db.update(todosTable).set({ title, priority }).where(eq(todosTable.id, id))
+
+  sendTodosToAllWebsockets()
+  sendTodoDetailToAllWebsockets(id)
 
   return redirectBack(c, '/')
 })
