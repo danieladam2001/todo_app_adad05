@@ -33,11 +33,6 @@
     <script>
       const ws = new WebSocket('ws://localhost:3000/ws')
 
-      ws.addEventListener('open', () => {
-        console.log('WS open')
-        ws.send('Hello, World!')
-      })
-
       ws.addEventListener('message', (ev) => {
         const json = JSON.parse(ev.data)
         if (json.type === 'todos') {

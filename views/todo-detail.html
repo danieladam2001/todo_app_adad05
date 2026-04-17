@@ -8,7 +8,7 @@
   <body>
     <p><a href="/">&larr; Zpět na seznam</a></p>
 
-    <div id="todo_detail"><%- include('_todo_detail.html') %></div>
+    <div id="todo"><%- include('_todo.html') %></div>
 
     <hr />
 
@@ -34,28 +34,13 @@
       const ws = new WebSocket('ws://localhost:3000/ws')
 
       ws.addEventListener('message', (ev) => {
-
-        const path = window.location.pathname;
-        const match = path.match(/\/todo\/(\d+)/);
-        const todoId = Number(match[1]);
-        console.log(todoId);
-
         const json = JSON.parse(ev.data)
-        console.log("type", json.type)
-        // console.log(todoId)
-        // console.log("update_todo_detailu",json.todo_id === todoId,json.type === 'todo_detail')
-        // console.log("delete_todo_detailu",json.todo_id === todoId,json.type === 'todo_detail_deleted')
-        if (json.type === 'todo_detail' & json.todo_id === todoId) {
-          console.log("a");
-          document.getElementById('todo_detail').innerHTML = json.html
-        } else if (json.type === 'todo_detail_deleted' & json.todo_id === todoId){
-          console.log("b");
-          window.location.href = '/todo-delete';
-        } else {
-          console.log("c")
+        if (json.type === 'todo-detail' && String(json.id) === "<%= todo.id %>") {
+          document.getElementById('todo').innerHTML = json.html
+        } else if (json.type === 'todo-removed' && String(json.id) === "<%= todo.id %>") {
+          document.location.replace('/')
         }
       })
     </script>
-
   </body>
 </html>
